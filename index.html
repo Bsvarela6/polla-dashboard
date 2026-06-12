@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Polla Raven 2026 — Mis pronósticos vs resultados</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f6f8f7; color: #1a2b22; padding: 20px; }
+  h1 { font-size: 19px; margin-bottom: 2px; }
+  .sub { color: #5b6f64; font-size: 12px; margin-bottom: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 9px; margin-bottom: 18px; }
+  .card { background: #fff; border: 1px solid #e3e9e5; border-radius: 10px; padding: 12px; text-align: center; }
+  .card .v { font-size: 24px; font-weight: 700; color: #14532d; }
+  .card .l { font-size: 10px; color: #5b6f64; text-transform: uppercase; letter-spacing: .04em; margin-top: 3px; }
+  .section { background: #fff; border: 1px solid #e3e9e5; border-radius: 10px; padding: 14px; margin-bottom: 16px; }
+  .section h2 { font-size: 14px; margin-bottom: 8px; color: #14532d; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 6px 8px; text-align: left; border-bottom: 1px solid #eef2ef; }
+  th { color: #5b6f64; font-size: 11px; text-transform: uppercase; }
+  td.c, th.c { text-align: center; }
+  .pill { display: inline-block; border-radius: 6px; padding: 2px 8px; font-weight: 700; font-size: 12px; }
+  .p3 { background: #d3f2da; color: #14532d; }
+  .p1 { background: #fdf3d0; color: #8a6d00; }
+  .p0 { background: #fdecea; color: #b3261e; }
+  tr.me { background: #e6f4ea; font-weight: 700; }
+  .muted { color: #8a9a90; font-size: 12px; margin-top: 4px; }
+  .stamp { font-size: 12px; padding: 8px 12px; border-radius: 8px; background: #e6f4ea; color: #1e7e34; margin-bottom: 14px; }
+  button.toggle { border: 1px solid #cfd9d2; background: #fff; border-radius: 6px; padding: 4px 12px; cursor: pointer; font-size: 12px; margin-top: 8px; color: #14532d; }
+</style>
+</head>
+<body>
+  <h1>⚽ Polla Raven 2026 — Mis pronósticos</h1>
+  <div class="sub">Benjamín Varela Guzman · se actualiza cada mañana con la rutina diaria de las 7:00</div>
+  <div class="stamp" id="stamp"></div>
+  <div id="kpis" class="grid"></div>
+  <div class="section" id="playedSec" style="display:none">
+    <h2>🎯 Pronóstico vs resultado (partidos jugados)</h2>
+    <table><thead><tr><th>Partido</th><th class="c">Mi pronóstico</th><th class="c">Resultado</th><th class="c">Puntos</th></tr></thead><tbody id="playedBody"></tbody></table>
+  </div>
+  <div class="section" id="upSec" style="display:none">
+    <h2>📅 Próximos partidos (pronóstico cargado)</h2>
+    <table><thead><tr><th>Fecha</th><th>Partido</th><th class="c">Mi pronóstico</th></tr></thead><tbody id="upBody"></tbody></table>
+    <button class="toggle" id="upToggle" style="display:none"></button>
+  </div>
+  <div class="section" id="rankSec" style="display:none">
+    <h2>🏆 Ranking</h2>
+    <table><thead><tr><th>#</th><th>Participante</th><th class="c">🎯</th><th class="c">✅</th><th class="c">Total</th></tr></thead><tbody id="rankBody"></tbody></table>
+  </div>
+  <div class="muted">Puntos: 🎯 exacto = 3 · ✅ resultado = 1 · ❌ fallo = 0 · Para refrescar manualmente, pídele a Claude: "actualiza el dashboard de la polla"</div>
+
+<script>
+// ====== DATOS (regenerados por la rutina diaria) ======
+const DATA = {
+  updated: "12 jun 2026, 13:30",
+  played: [
+    { home: "México", away: "Sudáfrica", pred: "2-0", res: "2-0", pts: 3 },
+    { home: "Corea del Sur", away: "Chequia", pred: "2-1", res: "2-1", pts: 3 }
+  ],
+  upcoming: [
+    ["2026-06-12T15:00","Canadá","Bosnia","1-0"],
+    ["2026-06-12T21:00","EE.UU.","Paraguay","2-0"],
+    ["2026-06-13T15:00","Qatar","Suiza","0-2"],
+    ["2026-06-13T18:00","Brasil","Marruecos","2-1"],
+    ["2026-06-13T21:00","Haití","Escocia","0-2"],
+    ["2026-06-14T00:00","Australia","Türkiye","1-2"],
+    ["2026-06-14T13:00","Alemania","Curazao","3-0"],
+    ["2026-06-14T16:00","P. Bajos","Japón","1-1"],
+    ["2026-06-14T19:00","C. de Marfil","Ecuador","0-1"],
+    ["2026-06-14T22:00","Suecia","Túnez","1-1"],
+    ["2026-06-15T12:00","España","Cabo Verde","3-0"],
+    ["2026-06-15T15:00","Bélgica","Egipto","2-0"],
+    ["2026-06-15T18:00","Arabia Saudita","Uruguay","0-2"],
+    ["2026-06-15T21:00","Irán","N. Zelanda","2-0"],
+    ["2026-06-16T15:00","Francia","Senegal","2-0"],
+    ["2026-06-16T18:00","Irak","Noruega","0-2"],
+    ["2026-06-16T21:00","Argentina","Argelia","2-0"],
+    ["2026-06-17T00:00","Austria","Jordania","2-0"],
+    ["2026-06-17T13:00","Portugal","RD Congo","2-0"],
+    ["2026-06-17T16:00","Inglaterra","Croacia","2-1"],
+    ["2026-06-17T19:00","Ghana","Panamá","1-1"],
+    ["2026-06-17T22:00","Uzbekistán","Colombia","0-2"],
+    ["2026-06-18T12:00","Chequia","Sudáfrica","1-0"],
+    ["2026-06-18T15:00","Suiza","Bosnia","2-0"],
+    ["2026-06-18T18:00","Canadá","Qatar","2-0"],
+    ["2026-06-18T21:00","México","Corea del Sur","2-1"],
+    ["2026-06-19T15:00","EE.UU.","Australia","2-0"],
+    ["2026-06-19T18:00","Escocia","Marruecos","0-2"],
+    ["2026-06-19T20:30","Brasil","Haití","3-0"],
+    ["2026-06-19T23:00","Türkiye","Paraguay","1-0"],
+    ["2026-06-20T13:00","P. Bajos","Suecia","2-1"],
+    ["2026-06-20T16:00","Alemania","C. de Marfil","2-0"],
+    ["2026-06-20T20:00","Ecuador","Curazao","2-0"],
+    ["2026-06-21T00:00","Túnez","Japón","0-2"],
+    ["2026-06-21T12:00","España","Arabia Saudita","2-0"],
+    ["2026-06-21T15:00","Bélgica","Irán","2-0"],
+    ["2026-06-21T18:00","Uruguay","Cabo Verde","2-0"],
+    ["2026-06-21T21:00","N. Zelanda","Egipto","0-2"],
+    ["2026-06-22T13:00","Argentina","Austria","2-0"],
+    ["2026-06-22T17:00","Francia","Irak","3-0"],
+    ["2026-06-22T20:00","Noruega","Senegal","1-2"],
+    ["2026-06-22T23:00","Jordania","Argelia","0-1"],
+    ["2026-06-23T13:00","Portugal","Uzbekistán","2-0"],
+    ["2026-06-23T16:00","Inglaterra","Ghana","2-0"],
+    ["2026-06-23T19:00","Panamá","Croacia","0-2"],
+    ["2026-06-23T22:00","Colombia","RD Congo","2-0"],
+    ["2026-06-24T15:00","Suiza","Canadá","1-1"],
+    ["2026-06-24T15:00","Bosnia","Qatar","1-0"],
+    ["2026-06-24T18:00","Marruecos","Haití","2-0"],
+    ["2026-06-24T18:00","Escocia","Brasil","1-2"],
+    ["2026-06-24T21:00","Sudáfrica","Corea del Sur","0-1"],
+    ["2026-06-24T21:00","Chequia","México","1-1"],
+    ["2026-06-25T16:00","Ecuador","Alemania","1-1"],
+    ["2026-06-25T16:00","Curazao","C. de Marfil","0-2"],
+    ["2026-06-25T19:00","Japón","Suecia","1-0"],
+    ["2026-06-25T19:00","Túnez","P. Bajos","0-2"],
+    ["2026-06-25T22:00","Türkiye","EE.UU.","1-1"],
+    ["2026-06-25T22:00","Paraguay","Australia","1-0"],
+    ["2026-06-26T15:00","Noruega","Francia","1-2"],
+    ["2026-06-26T15:00","Senegal","Irak","2-0"],
+    ["2026-06-26T20:00","Uruguay","España","1-2"],
+    ["2026-06-26T20:00","Cabo Verde","Arabia Saudita","0-1"],
+    ["2026-06-26T23:00","N. Zelanda","Bélgica","0-2"],
+    ["2026-06-26T23:00","Egipto","Irán","1-1"],
+    ["2026-06-27T17:00","Croacia","Ghana","2-0"],
+    ["2026-06-27T17:00","Panamá","Inglaterra","0-2"],
+    ["2026-06-27T19:30","RD Congo","Uzbekistán","1-1"],
+    ["2026-06-27T19:30","Colombia","Portugal","1-1"],
+    ["2026-06-27T22:00","Jordania","Argentina","0-2"],
+    ["2026-06-27T22:00","Argelia","Austria","1-1"]
+  ],
+  ranking: {
+    total: 48,
+    myPos: 1,
+    top: [
+      { name: "Benjamín Varela Guzman", me: 2, ar: 0, total: 6 },
+      { name: "Jerson López Castaño", me: 2, ar: 0, total: 6 },
+      { name: "Manuel Alverdi", me: 2, ar: 0, total: 6 },
+      { name: "Angel Corona", me: 1, ar: 1, total: 4 },
+      { name: "Giovanni Vargas", me: 1, ar: 1, total: 4 }
+    ]
+  }
+};
+// ====== FIN DATOS ======
+
+const ME = "Benjamín Varela";
+function kpi(v, l) { return `<div class="card"><div class="v">${v}</div><div class="l">${l}</div></div>`; }
+function fdate(iso) { const d = new Date(iso); return d.toLocaleDateString("es-CL", { day: "numeric", month: "short" }) + " · " + d.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" }); }
+
+document.getElementById("stamp").textContent = "📊 Datos al " + DATA.updated + " — la rutina diaria los refresca cada mañana a las 7:00";
+
+const ex = DATA.played.filter(p => p.pts === 3).length;
+const ok1 = DATA.played.filter(p => p.pts === 1).length;
+const bad = DATA.played.filter(p => p.pts === 0).length;
+const total = ex * 3 + ok1;
+const now = new Date();
+const upcoming = DATA.upcoming.map(u => ({ dt: new Date(u[0]), home: u[1], away: u[2], pred: u[3] })).filter(u => u.dt > now).sort((a, b) => a.dt - b.dt);
+const next = upcoming[0];
+
+document.getElementById("kpis").innerHTML =
+  kpi(total, "Puntos") + kpi(ex + " 🎯", "Exactos") + kpi(ok1 + " ✅", "Resultados") + kpi(bad + " ❌", "Fallos") +
+  (DATA.ranking ? kpi(DATA.ranking.myPos + "° / " + DATA.ranking.total, "Ranking") : "") +
+  (next ? kpi(next.pred, "Próx: " + next.home + "–" + next.away) : "");
+
+if (DATA.played.length) {
+  document.getElementById("playedSec").style.display = "block";
+  document.getElementById("playedBody").innerHTML = DATA.played.map(p => {
+    const cls = p.pts === 3 ? "p3" : p.pts === 1 ? "p1" : "p0";
+    const lab = p.pts === 3 ? "3 🎯" : p.pts === 1 ? "1 ✅" : "0 ❌";
+    return `<tr><td>${p.home} vs ${p.away}</td><td class="c">${p.pred}</td><td class="c"><b>${p.res}</b></td><td class="c"><span class="pill ${cls}">${lab}</span></td></tr>`;
+  }).join("");
+}
+
+if (upcoming.length) {
+  document.getElementById("upSec").style.display = "block";
+  const row = u => `<tr><td>${fdate(u.dt)}</td><td>${u.home} vs ${u.away}</td><td class="c"><b>${u.pred}</b></td></tr>`;
+  document.getElementById("upBody").innerHTML = upcoming.slice(0, 8).map(row).join("");
+  if (upcoming.length > 8) {
+    const btn = document.getElementById("upToggle");
+    btn.style.display = "inline-block"; btn.textContent = "Ver los " + upcoming.length + " partidos";
+    let open = false;
+    btn.onclick = () => { open = !open; document.getElementById("upBody").innerHTML = (open ? upcoming : upcoming.slice(0, 8)).map(row).join(""); btn.textContent = open ? "Ver menos" : "Ver los " + upcoming.length + " partidos"; };
+  }
+}
+
+if (DATA.ranking && DATA.ranking.top.length) {
+  document.getElementById("rankSec").style.display = "block";
+  document.getElementById("rankBody").innerHTML = DATA.ranking.top.map((r, i) =>
+    `<tr class="${r.name.includes(ME) ? "me" : ""}"><td>${i + 1}</td><td>${r.name}</td><td class="c">${r.me}</td><td class="c">${r.ar}</td><td class="c"><b>${r.total}</b></td></tr>`
+  ).join("");
+}
+</script>
+</body>
+</html>
