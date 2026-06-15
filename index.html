@@ -1,4 +1,12 @@
-<!DOCTYPE html>
+<!DOCTYPE html><script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Polla Raven Dashboard",
+  "schemaVersion": 1,
+  "description": "Dashboard de la Polla Raven 2026: pronóstico vs resultado real con puntos por partido (🎯3/✅1/❌0), próximos partidos con pronóstico cargado y ranking. Datos embebidos, refrescados por la rutina diaria de las 7:00.",
+  "mcpTools": [],
+  "mcpServerNames": []
+}
+</script>
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -25,6 +33,8 @@
   .p1 { background: #fdf3d0; color: #8a6d00; }
   .p0 { background: #fdecea; color: #b3261e; }
   tr.me { background: #e6f4ea; font-weight: 700; }
+  tr.live td { background: #fff7ed; }
+  .tag { font-size: 10px; color: #c2410c; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
   .muted { color: #8a9a90; font-size: 12px; margin-top: 4px; }
   .stamp { font-size: 12px; padding: 8px 12px; border-radius: 8px; background: #e6f4ea; color: #1e7e34; margin-bottom: 14px; }
   button.toggle { border: 1px solid #cfd9d2; background: #fff; border-radius: 6px; padding: 4px 12px; cursor: pointer; font-size: 12px; margin-top: 8px; color: #14532d; }
@@ -53,7 +63,7 @@
 <script>
 // ====== DATOS (regenerados por la rutina diaria) ======
 const DATA = {
-  updated: "14 jun 2026, 13:00",
+  updated: "15 jun 2026, 07:40",
   played: [
     { home: "México", away: "Sudáfrica", pred: "2-0", res: "2-0", pts: 3 },
     { home: "Corea del Sur", away: "Chequia", pred: "2-1", res: "2-1", pts: 3 },
@@ -62,17 +72,13 @@ const DATA = {
     { home: "Qatar", away: "Suiza", pred: "0-2", res: "1-1", pts: 0 },
     { home: "Brasil", away: "Marruecos", pred: "2-1", res: "1-1", pts: 0 },
     { home: "Haití", away: "Escocia", pred: "0-2", res: "0-1", pts: 1 },
-    { home: "Australia", away: "Türkiye", pred: "1-2", res: "2-0", pts: 0 }
+    { home: "Australia", away: "Türkiye", pred: "1-2", res: "2-0", pts: 0 },
+    { home: "Alemania", away: "Curazao", pred: "3-0", res: "7-1", pts: 1 },
+    { home: "P. Bajos", away: "Japón", pred: "1-1", res: "2-2", pts: 1 },
+    { home: "C. de Marfil", away: "Ecuador", pred: "0-1", res: "1-0", pts: 0 },
+    { home: "Suecia", away: "Túnez", pred: "1-1", res: "5-1", pts: 0 }
   ],
   upcoming: [
-    ["2026-06-12T21:00","EE.UU.","Paraguay","2-0"],
-    ["2026-06-13T15:00","Qatar","Suiza","0-2"],
-    ["2026-06-13T18:00","Brasil","Marruecos","2-1"],
-    ["2026-06-13T21:00","Haití","Escocia","0-2"],
-    ["2026-06-14T00:00","Australia","Türkiye","1-2"],
-    ["2026-06-14T13:00","Alemania","Curazao","3-0"],
-    ["2026-06-14T16:00","P. Bajos","Japón","1-1"],
-    ["2026-06-14T19:00","C. de Marfil","Ecuador","0-1"],
     ["2026-06-14T22:00","Suecia","Túnez","1-1"],
     ["2026-06-15T12:00","España","Cabo Verde","3-0"],
     ["2026-06-15T15:00","Bélgica","Egipto","2-0"],
@@ -136,14 +142,15 @@ const DATA = {
     ["2026-06-27T22:00","Argelia","Austria","1-1"]
   ],
   ranking: {
-    total: 48,
-    myPos: 5,
+    total: 50,
+    myPos: 7,
     top: [
-      { name: "Manuel Alverdi", me: 4, ar: 0, total: 12 },
-      { name: "Giovanni Vargas", me: 2, ar: 3, total: 9 },
-      { name: "Josue Sierra Chavira", me: 2, ar: 3, total: 9 },
-      { name: "Juan Andres Alfaro", me: 2, ar: 3, total: 9 },
-      { name: "Benjamín Varela Guzman", me: 2, ar: 2, total: 8 }
+      { name: "Juan Andres Alfaro", me: 3, ar: 5, total: 14 },
+      { name: "Manuel Alverdi", me: 4, ar: 1, total: 13 },
+      { name: "Giovanni Vargas", me: 2, ar: 6, total: 12 },
+      { name: "John Vazquez", me: 2, ar: 5, total: 11 },
+      { name: "Miguel Angel Perfetti", me: 2, ar: 5, total: 11 },
+      { name: "Benjamín Varela Guzman", me: 2, ar: 4, total: 10 }
     ]
   }
 };
@@ -160,8 +167,18 @@ const ok1 = DATA.played.filter(p => p.pts === 1).length;
 const bad = DATA.played.filter(p => p.pts === 0).length;
 const total = ex * 3 + ok1;
 const now = new Date();
-const upcoming = DATA.upcoming.map(u => ({ dt: new Date(u[0]), home: u[1], away: u[2], pred: u[3] })).filter(u => u.dt > now).sort((a, b) => a.dt - b.dt);
-const next = upcoming[0];
+
+// Partidos ya resueltos (con resultado cargado en "played")
+const playedKeys = new Set(DATA.played.map(p => p.home + "|" + p.away));
+// Calendario que aún NO tiene resultado, en orden cronológico
+const sched = DATA.upcoming
+  .map(u => ({ dt: new Date(u[0]), home: u[1], away: u[2], pred: u[3] }))
+  .filter(u => !playedKeys.has(u.home + "|" + u.away))
+  .sort((a, b) => a.dt - b.dt);
+// "pending" = ya empezaron pero su resultado no está cargado aún (no deben desaparecer)
+const pending = sched.filter(u => u.dt <= now);
+const future = sched.filter(u => u.dt > now);
+const next = future[0];
 
 document.getElementById("kpis").innerHTML =
   kpi(total, "Puntos") + kpi(ex + " 🎯", "Exactos") + kpi(ok1 + " ✅", "Resultados") + kpi(bad + " ❌", "Fallos") +
@@ -177,15 +194,23 @@ if (DATA.played.length) {
   }).join("");
 }
 
-if (upcoming.length) {
+if (pending.length || future.length) {
   document.getElementById("upSec").style.display = "block";
-  const row = u => `<tr><td>${fdate(u.dt)}</td><td>${u.home} vs ${u.away}</td><td class="c"><b>${u.pred}</b></td></tr>`;
-  document.getElementById("upBody").innerHTML = upcoming.slice(0, 8).map(row).join("");
-  if (upcoming.length > 8) {
+  const futRow = u => `<tr><td>${fdate(u.dt)}</td><td>${u.home} vs ${u.away}</td><td class="c"><b>${u.pred}</b></td></tr>`;
+  const pendRow = u => `<tr class="live"><td>⏳ ${fdate(u.dt)}</td><td>${u.home} vs ${u.away} <span class="tag">en juego / por confirmar</span></td><td class="c"><b>${u.pred}</b></td></tr>`;
+  function dayBlocks(list, minN) {
+    const out = []; let last = null;
+    for (const u of list) { const dk = u.dt.toDateString(); if (out.length >= minN && dk !== last) break; out.push(u); last = dk; }
+    return out;
+  }
+  const shown = dayBlocks(future, 8);
+  let open = false;
+  const render = () => pending.map(pendRow).join("") + (open ? future : shown).map(futRow).join("");
+  document.getElementById("upBody").innerHTML = render();
+  if (future.length > shown.length) {
     const btn = document.getElementById("upToggle");
-    btn.style.display = "inline-block"; btn.textContent = "Ver los " + upcoming.length + " partidos";
-    let open = false;
-    btn.onclick = () => { open = !open; document.getElementById("upBody").innerHTML = (open ? upcoming : upcoming.slice(0, 8)).map(row).join(""); btn.textContent = open ? "Ver menos" : "Ver los " + upcoming.length + " partidos"; };
+    btn.style.display = "inline-block"; btn.textContent = "Ver los " + future.length + " partidos";
+    btn.onclick = () => { open = !open; document.getElementById("upBody").innerHTML = render(); btn.textContent = open ? "Ver menos" : "Ver los " + future.length + " partidos"; };
   }
 }
 
