@@ -63,7 +63,7 @@
 <script>
 // ====== DATOS (regenerados por la rutina diaria) ======
 const DATA = {
-  updated: "16 jun 2026, 07:40",
+  updated: "17 jun 2026, 13:45",
   played: [
     { home: "México", away: "Sudáfrica", pred: "2-0", res: "2-0", pts: 3 },
     { home: "Corea del Sur", away: "Chequia", pred: "2-1", res: "2-1", pts: 3 },
@@ -80,13 +80,13 @@ const DATA = {
     { home: "España", away: "Cabo Verde", pred: "3-0", res: "0-0", pts: 0 },
     { home: "Bélgica", away: "Egipto", pred: "2-0", res: "1-1", pts: 0 },
     { home: "Arabia Saudita", away: "Uruguay", pred: "0-2", res: "1-1", pts: 0 },
-    { home: "Irán", away: "N. Zelanda", pred: "2-0", res: "2-2", pts: 0 }
+    { home: "Irán", away: "N. Zelanda", pred: "2-0", res: "2-2", pts: 0 },
+    { home: "Francia", away: "Senegal", pred: "2-0", res: "3-1", pts: 1 },
+    { home: "Irak", away: "Noruega", pred: "0-2", res: "1-4", pts: 1 },
+    { home: "Argentina", away: "Argelia", pred: "2-0", res: "3-0", pts: 1 },
+    { home: "Austria", away: "Jordania", pred: "2-0", res: "3-1", pts: 1 }
   ],
   upcoming: [
-    ["2026-06-16T15:00","Francia","Senegal","2-0"],
-    ["2026-06-16T18:00","Irak","Noruega","0-2"],
-    ["2026-06-16T21:00","Argentina","Argelia","2-0"],
-    ["2026-06-17T00:00","Austria","Jordania","2-0"],
     ["2026-06-17T13:00","Portugal","RD Congo","2-0"],
     ["2026-06-17T16:00","Inglaterra","Croacia","2-1"],
     ["2026-06-17T19:00","Ghana","Panamá","1-1"],
@@ -142,14 +142,14 @@ const DATA = {
   ],
   ranking: {
     total: 50,
-    myPos: 10,
+    myPos: 12,
     top: [
-      { name: "Cuicani Segundo Hernández", me: 4, ar: 4, total: 16 },
-      { name: "Juan Andres Alfaro", me: 3, ar: 6, total: 15 },
-      { name: "Hugo Lechuga", me: 2, ar: 7, total: 13 },
-      { name: "Jerson López Castaño", me: 3, ar: 4, total: 13 },
-      { name: "Manuel Alverdi", me: 4, ar: 1, total: 13 },
-      { name: "Benjamín Varela Guzman", me: 2, ar: 4, total: 10 }
+      { name: "Cuicani Segundo Hernández", me: 4, ar: 6, total: 18 },
+      { name: "Jerson López Castaño", me: 3, ar: 8, total: 17 },
+      { name: "Juan Andres Alfaro", me: 3, ar: 8, total: 17 },
+      { name: "Miguel Angel Perfetti", me: 3, ar: 8, total: 17 },
+      { name: "Giovanni Vargas", me: 2, ar: 10, total: 16 },
+      { name: "Benjamín Varela Guzman", me: 2, ar: 8, total: 14 }
     ]
   }
 };
@@ -174,7 +174,6 @@ const sched = DATA.upcoming
   .map(u => ({ dt: new Date(u[0]), home: u[1], away: u[2], pred: u[3] }))
   .filter(u => !playedKeys.has(u.home + "|" + u.away))
   .sort((a, b) => a.dt - b.dt);
-// "pending" = ya empezaron pero su resultado no está cargado aún (no deben desaparecer)
 const pending = sched.filter(u => u.dt <= now);
 const future = sched.filter(u => u.dt > now);
 const next = future[0];
