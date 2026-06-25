@@ -63,7 +63,7 @@
 <script>
 // ====== DATOS (regenerados por la rutina diaria) ======
 const DATA = {
-  updated: "24 jun 2026, 07:10",
+  updated: "25 jun 2026, 07:05",
   played: [
     { home: "Uzbekistán", away: "Colombia", pred: "0-2", res: "1-3", pts: 1 },
     { home: "Ghana", away: "Panamá", pred: "1-1", res: "1-0", pts: 0 },
@@ -112,7 +112,13 @@ const DATA = {
     { home: "México", away: "Corea del Sur", pred: "2-1", res: "1-0", pts: 1 },
     { home: "Canadá", away: "Qatar", pred: "2-0", res: "6-0", pts: 1 },
     { home: "Suiza", away: "Bosnia", pred: "1-0", res: "4-1", pts: 1 },
-    { home: "Chequia", away: "Sudáfrica", pred: "1-0", res: "1-1", pts: 0 }
+    { home: "Chequia", away: "Sudáfrica", pred: "1-0", res: "1-1", pts: 0 },
+    { home: "Chequia", away: "México", pred: "1-1", res: "0-3", pts: 0 },
+    { home: "Sudáfrica", away: "Corea del Sur", pred: "0-1", res: "1-0", pts: 0 },
+    { home: "Escocia", away: "Brasil", pred: "1-2", res: "0-3", pts: 1 },
+    { home: "Marruecos", away: "Haití", pred: "2-0", res: "4-2", pts: 1 },
+    { home: "Suiza", away: "Canadá", pred: "1-1", res: "2-1", pts: 0 },
+    { home: "Bosnia", away: "Qatar", pred: "1-0", res: "3-1", pts: 1 }
   ],
   upcoming: [
     ["2026-06-24T15:00","Suiza","Canadá","1-1"],
@@ -142,13 +148,13 @@ const DATA = {
   ],
   ranking: {
     total: 50,
-    myPos: 1,
+    myPos: 2,
     top: [
-      { name: "Benjamín Varela Guzman", me: 7, ar: 21, total: 42 },
-      { name: "Chris Ellison", me: 5, ar: 24, total: 39 },
-      { name: "Giovanni Vargas", me: 5, ar: 24, total: 39 },
-      { name: "Jerson López Castaño", me: 5, ar: 24, total: 39 },
-      { name: "Miguel Angel Perfetti", me: 5, ar: 24, total: 39 }
+      { name: "Angel Corona", me: 6, ar: 27, total: 45 },
+      { name: "Benjamín Varela Guzman", me: 7, ar: 24, total: 45 },
+      { name: "Vicente Yeomans", me: 4, ar: 32, total: 44 },
+      { name: "Miguel Angel Perfetti", me: 5, ar: 28, total: 43 },
+      { name: "Chris Ellison", me: 5, ar: 27, total: 42 }
     ]
   }
 };
@@ -196,7 +202,6 @@ if (pending.length || future.length) {
   document.getElementById("upSec").style.display = "block";
   const futRow = u => `<tr><td>${fdate(u.dt)}</td><td>${u.home} vs ${u.away}</td><td class="c"><b>${u.pred}</b></td></tr>`;
   const pendRow = u => `<tr class="live"><td>⏳ ${fdate(u.dt)}</td><td>${u.home} vs ${u.away} <span class="tag">en juego / por confirmar</span></td><td class="c"><b>${u.pred}</b></td></tr>`;
-  // Mostrar días completos hasta cubrir al menos 8 partidos — nunca cortar un mismo día a la mitad
   function dayBlocks(list, minN) {
     const out = []; let last = null;
     for (const u of list) { const dk = u.dt.toDateString(); if (out.length >= minN && dk !== last) break; out.push(u); last = dk; }
