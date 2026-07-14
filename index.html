@@ -63,7 +63,7 @@
 <script>
 // ====== DATOS (regenerados por la rutina diaria) ======
 const DATA = {
-  updated: "13 jul 2026, 09:41",
+  updated: "14 jul 2026, 07:11",
   played: [
     { home: "Uzbekistán", away: "Colombia", pred: "0-2", res: "1-3", pts: 1 },
     { home: "Ghana", away: "Panamá", pred: "1-1", res: "1-0", pts: 0 },
@@ -226,7 +226,6 @@ if (pending.length || future.length) {
   document.getElementById("upSec").style.display = "block";
   const futRow = u => `<tr><td>${fdate(u.dt)}</td><td>${u.home} vs ${u.away}</td><td class="c"><b>${u.pred}</b></td></tr>`;
   const pendRow = u => `<tr class="live"><td>⏳ ${fdate(u.dt)}</td><td>${u.home} vs ${u.away} <span class="tag">en juego / por confirmar</span></td><td class="c"><b>${u.pred}</b></td></tr>`;
-  // Mostrar días completos hasta cubrir al menos 8 partidos — nunca cortar un mismo día a la mitad
   function dayBlocks(list, minN) {
     const out = []; let last = null;
     for (const u of list) { const dk = u.dt.toDateString(); if (out.length >= minN && dk !== last) break; out.push(u); last = dk; }
