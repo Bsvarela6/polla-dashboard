@@ -63,7 +63,7 @@
 <script>
 // ====== DATOS (regenerados por la rutina diaria) ======
 const DATA = {
-  updated: "14 jul 2026, 07:11",
+  updated: "15 jul 2026, 07:15",
   played: [
     { home: "Uzbekistán", away: "Colombia", pred: "0-2", res: "1-3", pts: 1 },
     { home: "Ghana", away: "Panamá", pred: "1-1", res: "1-0", pts: 0 },
@@ -164,10 +164,10 @@ const DATA = {
     { home: "Francia", away: "Marruecos", pred: "1-0", res: "2-0", pts: 1 },
     { home: "España", away: "Bélgica", pred: "2-1", res: "2-1", pts: 3 },
     { home: "Noruega", away: "Inglaterra", pred: "1-2", res: "1-2", pts: 3 },
-    { home: "Argentina", away: "Suiza", pred: "2-0", res: "3-1", pts: 1 }
+    { home: "Argentina", away: "Suiza", pred: "2-0", res: "3-1", pts: 1 },
+    { home: "Francia", away: "España", pred: "1-0", res: "0-2", pts: 0 }
   ],
   upcoming: [
-    ["2026-07-14T15:00","Francia","España","1-0"],
     ["2026-07-15T15:00","Inglaterra","Argentina","0-1"]
   ],
   ranking: {
@@ -176,7 +176,7 @@ const DATA = {
     top: [
       { name: "Benjamín Varela Guzman", me: 17, ar: 50, total: 101 },
       { name: "Chris Ellison", me: 16, ar: 48, total: 96 },
-      { name: "Sandra Germán Barranco", me: 14, ar: 52, total: 94 },
+      { name: "Sandra Germán Barranco", me: 14, ar: 53, total: 95 },
       { name: "Jerson López Castaño", me: 15, ar: 47, total: 92 },
       { name: "Angel Corona", me: 14, ar: 50, total: 92 }
     ]
@@ -196,14 +196,11 @@ const bad = DATA.played.filter(p => p.pts === 0).length;
 const total = ex * 3 + ok1;
 const now = new Date();
 
-// Partidos ya resueltos (con resultado cargado en "played")
 const playedKeys = new Set(DATA.played.map(p => p.home + "|" + p.away));
-// Calendario que aún NO tiene resultado, en orden cronológico
 const sched = DATA.upcoming
   .map(u => ({ dt: new Date(u[0]), home: u[1], away: u[2], pred: u[3] }))
   .filter(u => !playedKeys.has(u.home + "|" + u.away))
   .sort((a, b) => a.dt - b.dt);
-// "pending" = ya empezaron pero su resultado no está cargado aún (no deben desaparecer)
 const pending = sched.filter(u => u.dt <= now);
 const future = sched.filter(u => u.dt > now);
 const next = future[0];
